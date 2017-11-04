@@ -1,23 +1,8 @@
-/**
- * @license
- * Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
- * This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
- * The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
- * The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
- * Code distributed by Google as part of the polymer project is also
- * subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
- */
-
-/* eslint-env node */
-
 module.exports = {
   staticFileGlobs: [
-    '/index.html',
-    '/manifest.json',
-    '/bower_components/webcomponentsjs/webcomponents-loader.js',
-    '/src/**/*',
-    '/images/**/*',
-    '/data/**/*'
+    'manifest.json',
+    'bower_components/webcomponentsjs/webcomponents-loader.js',
+    'images/*'
   ],
   runtimeCaching: [
     {
@@ -28,8 +13,19 @@ module.exports = {
           name: 'webcomponentsjs-polyfills-cache'
         }
       }
-    }
+    },
+    {
+      urlPattern: /\/v0\/.*/,
+      handler: 'fastest',
+      options: {
+        cache: {
+          maxEntries: 200,
+          name: 'items-cache'
+        }
+      }
+    },
   ],
-  navigateFallback: '/index.html',
-  navigateFallbackWhitelist: [ /^\/[^\_]+\/?/ ]
+  directoryIndex: 'index.html',
+  navigateFallback: 'index.html',  
+  navigateFallbackWhitelist: [/^(?!\/__).*/],
 };

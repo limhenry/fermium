@@ -1,0 +1,217 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer-element.html">
+<link rel="import" href="../bower_components/polymer/lib/mixins/gesture-event-listeners.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+<link rel="import" href="../bower_components/iron-selector/iron-selector.html">
+<link rel="import" href="../bower_components/iron-pages/iron-pages.html">
+<link rel="import" href="../bower_components/polymerfire/firebase-database-script.html">
+<link rel="import" href="../bower_components/app-storage/app-indexeddb-mirror/app-indexeddb-mirror.html">
+<link rel="import" href="gdg-dialog.html">
+<link rel="import" href="shared-styles.html">
+
+<dom-module id="gdg-speakers">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+
+      .container {
+        max-width: 1200px;
+        box-sizing: border-box;
+        padding: 10px 10px 96px 10px;
+        margin: 0 64px;
+        display: grid;
+        grid-gap: 16px;
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .speaker_loading {
+        padding: 30px 80px;
+        background-color: #FAFAFA;
+        border-top: 1px solid #dcdcdc;
+        border-bottom: 1px solid #dcdcdc;
+        font-family: 'Roboto', 'Noto', sans-serif;
+      }
+
+      .card {
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.07), 0 2px 2px 0 rgba(0, 0, 0, 0.15);
+        padding: 32px 24px;
+        background: #fff;
+        text-align: center;
+        text-decoration: none;
+        transition: 150ms box-shadow ease-in-out;
+      }
+
+      .card:hover {
+        box-shadow: 0 3px 3px -2px rgba(0, 0, 0, 0.2), 0 3px 4px 0 rgba(0, 0, 0, 0.14), 0 1px 8px 0 rgba(0, 0, 0, 0.12)
+      }
+
+      .speaker .picture {
+        display: block;
+        margin: 0 auto;
+        height: 128px;
+        width: 128px;
+        border-radius: 50%;
+        background-size: cover;
+        background-position: center;
+      }
+
+      .speaker .name {
+        color: rgb(66, 66, 66);
+        margin-top: 16px;
+        font-size: 22px;
+        font-family: "Product Sans", arial, sans-serif;
+      }
+
+      .speaker .origin {
+        color: rgb(66, 66, 66);
+        font-size: 14px;
+      }
+
+      .speaker .bio {
+        margin-top: 16px;
+        color: rgb(117, 117, 117);
+        font-size: 15px;
+        line-height: 24px;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      @media screen and (max-width: 1200px) {
+        .container {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+
+      @media screen and (max-width: 1000px) {
+        .container {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+
+      @media screen and (max-width: 860px) {
+        .container {
+          padding: 10px 0 64px 0;
+          margin: 0 16px;
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .speaker_loading {
+          padding: 24px 32px;
+        }
+      }
+
+      @media screen and (max-width: 560px) {
+        .container {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+
+    <div class="hero">
+      <div class="hero_big_title">Speakers</div>
+      <div class="hero_description">Hear from the Googlers, Partners, and Guest Speakers who are building the future of cloud. Check back often as we add
+        more speakers, including our customers and partners.</div>
+    </div>
+
+    <app-route route="{{route}}" pattern="/speakers/:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
+
+    <app-indexeddb-mirror id="indexeddb" key="speakers" data="{{speakers}}" persisted-data="{{persistedSpeakerData}}">
+    </app-indexeddb-mirror>
+
+    <dom-if if="{{!persistedSpeakerData}}">
+      <template>
+        <div class="speaker_loading">
+          Loading speakers information ...
+        </div>
+      </template>
+    </dom-if>
+
+    <div class="container">
+      <dom-repeat items="{{_toArray(persistedSpeakerData)}}">
+        <template>
+          <a href="/speakers/{{item.id}}" class="speaker card">
+            <div class="picture" style$="background-image:url({{item.value.picture}})"></div>
+            <div class="name">{{item.value.name}}</div>
+            <div class="origin">{{item.value.origin}}</div>
+            <div class="bio">{{item.value.bio}}
+            </div>
+          </a>
+        </template>
+      </dom-repeat>
+    </div>
+  </template>
+
+  <script>
+    class GdgSpeakers extends Polymer.GestureEventListeners(Polymer.Element) {
+      static get is() { return 'gdg-speakers'; }
+
+      static get observers() {
+        return [
+          '_routePageChanged(routeData.page)'
+        ];
+      }
+
+      static get properties() {
+        return {
+          page: {
+            notify: true,
+            value: 'agenda'
+          },
+          user: {
+            observer: '_onUserChanged'
+          },
+          persistedSpeakerData: {
+            value: {},
+            observer: '_onpersistedSpeakerDataChanged'
+          }
+        }
+      }
+
+      _onpersistedSpeakerDataChanged(item) {
+        console.log(item)
+      }
+
+      _routePageChanged(page) {
+        var data = this.get('persistedSpeakerData');
+        if (page != undefined && page.length > 0 && data) {
+          this.dispatchEvent(new CustomEvent('showdialog', { detail: { speaker: data[page] } }));
+        }
+        else {
+          this.page = 'agenda';
+        }
+      }
+
+      _toArray(obj) {
+        return Object.keys(obj).map((key) => {
+          return {
+            id: key,
+            value: obj[key]
+          };
+        });
+      }
+
+      _onUserChanged() {
+        if (this.user || this.user == null) {
+          var speakerRef = firebase.database().ref('speakers/');
+          speakerRef.once('value').then(snapshot => {
+            this.set('speakers', snapshot.val());
+            this._routePageChanged(this.routeData.page);
+          })
+        }
+      }
+    }
+
+    window.customElements.define(GdgSpeakers.is, GdgSpeakers);
+  </script>
+</dom-module>

@@ -1,11 +1,12 @@
 {
   "entrypoint": "index.html",
-  "shell": "src/io-app.html",
+  "shell": "src/gdg-app.html",
   "fragments": [
-    "src/io-home.html",
-    "src/io-sessions.html",
-    "src/io-attending.html",
-    "src/io-cod.html"
+    "src/gdg-home.html",
+    "src/gdg-schedule.html",
+    "src/gdg-speakers.html",
+    "src/gdg-attending.html",
+    "src/gdg-cod.html"
   ],
   "sources": [
     "src/**/*",
@@ -14,9 +15,9 @@
     "bower.json"
   ],
   "extraDependencies": [
-    "_redirects",
     "manifest.json",
-    "bower_components/webcomponentsjs/*.js"
+    "bower_components/webcomponentsjs/*.js",
+    "bower_components/app-storage/app-indexeddb-mirror/*.js"
   ],
   "lint": {
     "rules": ["polymer-2"]

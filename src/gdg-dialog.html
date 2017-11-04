@@ -15,7 +15,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
 <link rel="import" href="shared-styles.html">
 
-<dom-module id="io-dialog">
+<dom-module id="gdg-dialog">
     <template>
         <style include="shared-styles">
             paper-dialog {
@@ -32,6 +32,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             paper-dialog .header {
                 margin: 0;
                 padding: 0;
+                background: #3F51B5;
+                color: white;
             }
 
             paper-dialog paper-icon-button {
@@ -79,13 +81,23 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 font-size: 38px;
             }
 
-            paper-dialog .speaker_header .speaker_title {
+            paper-dialog .speaker_detail .speaker_origin {
+                font-family: "Product Sans", arial, sans-serif;
                 font-size: 18px;
+                color: #2b2b2b;
+            }
+
+            paper-dialog .speaker_detail .speaker_title {
+                font-family: "Product Sans", arial, sans-serif;
+                font-size: 16px;
+                margin-bottom: 12px;
+                color: #2b2b2b;
             }
 
             paper-dialog .content {
                 padding: 40px 20px;
                 line-height: 28px;
+                color: #424242;
             }
 
             paper-dialog .session_title,
@@ -100,7 +112,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             paper-dialog .speaker_header h1 {
                 line-height: 1.1;
                 margin: 32px auto;
-                color: #4A4A4A;
+                color: white;
                 font-weight: 400;
             }
 
@@ -166,27 +178,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             id="dialog">
             <dom-if if="{{speakerdetail}}">
                 <template>
-                    <div class="header" id$="{{_toLowerCase(sessiondetail.tag.0)}}">
-                        <paper-icon-button icon="io-icons:arrow-back" on-tap="showSession"></paper-icon-button>
+                    <div class="header">
+                        <paper-icon-button icon="gdg-icons:arrow-back" dialog-dismiss></paper-icon-button>
                         <div class="speaker_header">
                             <div class="speaker_photo" style$="background-image: url({{speakerdetail.picture}})"></div>
                             <div class="session_speaker_info">
                                 <div class="speaker_name">{{speakerdetail.name}}</div>
-                                <div class="speaker_title">{{speakerdetail.title}}</div>
+
                             </div>
                         </div>
                     </div>
                     <div class="content">
                         <div class="speaker_detail">
+                            <div class="speaker_origin">{{speakerdetail.origin}}</div>
+                            <div class="speaker_title">{{speakerdetail.title}}</div>
                             <div class="speaker_description">{{speakerdetail.description}}</div>
                         </div>
                     </div>
                 </template>
             </dom-if>
-            <dom-if if="{{!speakerdetail}}">
+            <dom-if if="{{sessiondetail}}">
                 <template>
-                    <div class="header" id$="{{_toLowerCase(sessiondetail.tag.0)}}">
-                        <paper-icon-button icon="io-icons:arrow-back" dialog-dismiss></paper-icon-button>
+                    <div class="header">
+                        <paper-icon-button icon="gdg-icons:arrow-back" dialog-dismiss></paper-icon-button>
                         <div class="session_header">
                             <h1 class="session_title">{{sessiondetail.title}}</h1>
                         </div>
@@ -198,7 +212,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                 <div class="session_location">{{sessiondetail.location}}</div>
                             </div>
                             <div class="session_description">{{sessiondetail.description}}</div>
-                            <dom-if if="{{sessiondetail.speaker}}">
+                            <!-- <dom-if if="{{sessiondetail.speaker}}">
                                 <template>
                                     <dom-repeat items="{{sessiondetail.speaker}}">
                                         <template>
@@ -212,7 +226,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                                         </template>
                                     </dom-repeat>
                                 </template>
-                            </dom-if>
+                            </dom-if> -->
                         </div>
                     </div>
                 </template>
@@ -221,35 +235,53 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </template>
 
     <script>
-        class IoDialog extends Polymer.GestureEventListeners(Polymer.Element) {
-            static get is() { return 'io-dialog'; }
+        class GdgDialog extends Polymer.GestureEventListeners(Polymer.Element) {
+            static get is() { return 'gdg-dialog'; }
 
-            showSpeaker(event) {
-                this.set('speakerdetail', event.model.item);
-                this.$.dialog.notifyResize();
-            }
+            // showSpeaker(event) {
+            //     this.set('speakerdetail', event.model.item);
+            //     this.$.dialog.notifyResize();
+            // }
 
-            showSession() {
-                this.set('speakerdetail', null);
-                this.$.dialog.notifyResize();
-            }
+            // showSession() {
+            //     this.set('speakerdetail', null);
+            //     this.$.dialog.notifyResize();
+            // }
 
             _toLowerCase(item) {
                 if (!item) return "misc"
                 return item.replace(/ /g, '').toLowerCase();
             }
 
-            _onPaperDialogChanged() {
+            _onPaperDialogChanged(event) {
+                if (event.type == 'iron-overlay-closed') {
+                    if (this.route == 'schedule') {
+                        window.history.pushState({}, null, '/schedule');
+                    }
+                    else {
+                        window.history.pushState({}, null, '/speakers');
+                    }
+                    window.dispatchEvent(new CustomEvent('location-changed'));
+                }
                 this.dispatchEvent(new CustomEvent('dialogchanged', { detail: this.$.dialog.opened }));
             }
 
             open(e) {
-                this.set('speakerdetail', null);
-                this.set('sessiondetail', e.detail);
+                console.log(e.detail)
+                if (e.detail.speaker) {
+                    this.set('sessiondetail', null);
+                    this.set('speakerdetail', e.detail.speaker);
+                }
+                else {
+                    this.set('speakerdetail', null);
+                    this.set('sessiondetail', e.detail.schedule);
+                }
+                // this.set('speakerdetail', null);
+                // this.set('sessiondetail', e.detail);
                 this.$.dialog.open()
             }
         }
 
-        window.customElements.define(IoDialog.is, IoDialog);
+        window.customElements.define(GdgDialog.is, GdgDialog);
     </script>
 </dom-module>

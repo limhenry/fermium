@@ -21,11 +21,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="import" href="../bower_components/polymerfire/firebase-app-script.html">
 <link rel="import" href="effects/resize-header.html">
 
-<link rel="lazy-import" href="io-home.html">
-<link rel="lazy-import" href="io-sessions.html">
-<link rel="lazy-import" href="io-attending.html">
-<link rel="lazy-import" href="io-cod.html">
-<link rel="lazy-import" href="io-analytics.html">
+<link rel="lazy-import" href="gdg-home.html">
+<link rel="lazy-import" href="gdg-schedule.html">
+<link rel="lazy-import" href="gdg-speakers.html">
+<link rel="lazy-import" href="gdg-attending.html">
+<link rel="lazy-import" href="gdg-cod.html">
+<link rel="lazy-import" href="gdg-analytics.html">
 <link rel="lazy-import" href="../bower_components/polymerfire/firebase-auth-script.html">
 <link rel="lazy-import" href="../bower_components/app-layout/app-drawer/app-drawer.html">
 <link rel="lazy-import" href="../bower_components/paper-icon-button/paper-icon-button.html">
@@ -36,7 +37,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <link rel="lazy-import" href="../bower_components/iron-iconset-svg/iron-iconset-svg.html">
 <link rel="lazy-import" href="../bower_components/polymerfire/firebase-database-script.html">
 
-<dom-module id="io-app">
+<dom-module id="gdg-app">
   <template>
     <style>
        :host {
@@ -251,7 +252,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
 
-    <io-analytics key="UA-76843776-4"></io-analytics>
+    <gdg-analytics key="UA-76843776-4"></gdg-analytics>
 
     <app-location route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="[[rootPattern]]:page" data="{{routeData}}" tail="{{subroute}}"></app-route>
@@ -263,7 +264,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
           <app-toolbar>Menu</app-toolbar>
           <iron-selector selected="[[page]]" attr-for-selected="name" class="drawer-list" role="navigation">
             <a name="home" href="home">Home</a>
-            <a name="sessions" href="sessions">Sessions</a>
+            <a name="schedule" href="schedule">Schedule</a>
+            <a name="speakers" href="speakers">Speakers</a>
             <a name="attending" href="attending">Attending</a>
             <a name="cod" href="cod">Code of Conduct</a>
           </iron-selector>
@@ -275,62 +277,49 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-header slot="header" fixed condenses effects="resize-header">
         <app-toolbar id="header">
           <div>
-            <img src="../images/io.svg" condensed-title width="56.5" height="40">
+            <img src="../images/logo.svg" condensed-title width="150" height="52">
           </div>
           <div style="flex:1"></div>
           <iron-selector selected="[[page]]" attr-for-selected="name" class="nav-list" role="navigation">
             <a name="home" href="home">Home</a>
-            <a name="sessions" href="sessions">Sessions</a>
+            <a name="schedule" href="schedule">Schedule</a>
+            <a name="speakers" href="speakers">Speakers</a>
             <a name="attending" href="attending">Attending</a>
             <a name="cod" href="cod">Code of Conduct</a>
           </iron-selector>
-          <iron-selector class="nav-list no-tab">
-            <dom-if if="[[!user]]">
-              <template>
-                <a on-tap="signIn">Sign In</a>
-              </template>
-            </dom-if>
-            <dom-if if="[[user]]">
-              <template>
-                <img src$="{{user.photoURL}}" on-tap="signIn">
-              </template>
-            </dom-if>
-          </iron-selector>
-          <paper-icon-button icon="io-icons:menu" on-tap="_toggleDrawer"></paper-icon-button>
+          <paper-icon-button icon="gdg-icons:menu" on-tap="_toggleDrawer"></paper-icon-button>
         </app-toolbar>
         <app-toolbar style="height: 240px; background-color: transparent; align-items: flex-end">
           <div>
-            <img src="../images/io.svg" main-title width="188" height="133">
+            <img src="../images/logo.svg" main-title width="320" height="150">
           </div>
         </app-toolbar>
       </app-header>
 
       <iron-pages selected="[[page]]" attr-for-selected="name" fallback-selection="view404" role="main">
-        <io-home name="home" ticket="[[ticket]]"></io-home>
-        <io-sessions name="sessions" user="{{user}}"></io-sessions>
-        <io-attending name="attending"></io-attending>
-        <io-cod name="cod"></io-cod>
+        <gdg-home name="home" ticket="[[ticket]]"></gdg-home>
+        <gdg-schedule name="schedule" route="{{route}}" user="{{user}}"></gdg-schedule>
+        <gdg-speakers name="speakers" route="{{route}}" user="{{user}}"></gdg-speakers>
+        <gdg-attending name="attending"></gdg-attending>
+        <gdg-cod name="cod"></gdg-cod>
       </iron-pages>
 
       <dom-if if="[[_shouldRenderLazy]]">
         <template>
           <footer>
-            <div class="footer_hashtag">
-              <img src="../images/iohashtag.svg" width="277" height="95">
-            </div>
             <div class="footer_content">
               <div class="footer_logo">
                 <img src="../images/gdgkl.svg" width="630" height="138">
               </div>
               <div class="footer_social">
                 <a aria-label="Facebook" href="https://www.facebook.com/GDGKualaLumpur/" target="_blank" rel="noopener">
-                  <iron-icon icon="io-icons:facebook"></iron-icon>
+                  <iron-icon icon="gdg-icons:facebook"></iron-icon>
                 </a>
                 <a aria-label="Google Plus" href="https://plus.google.com/+GdgMy" target="_blank" rel="noopener">
-                  <iron-icon icon="io-icons:googleplus"></iron-icon>
+                  <iron-icon icon="gdg-icons:googleplus"></iron-icon>
                 </a>
                 <a aria-label="Twitter" href="https://twitter.com/gdgkl" target="_blank" rel="noopener">
-                  <iron-icon icon="io-icons:twitter"></iron-icon>
+                  <iron-icon icon="gdg-icons:twitter"></iron-icon>
                 </a>
               </div>
             </div>
@@ -341,13 +330,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <paper-toast id="toast" text="A new version of this app is available." duration="3000">
       <span on-tap="reload">Refresh Now</span>
     </paper-toast>
-    <io-dialog id="dialog"></io-dialog>
+    <gdg-dialog id="dialog" route="{{routeData.page}}"></gdg-dialog>
   </template>
 
   <script>
-    class IoApp extends Polymer.GestureEventListeners(Polymer.Element) {
+    class GdgApp extends Polymer.GestureEventListeners(Polymer.Element) {
 
-      static get is() { return 'io-app'; }
+      static get is() { return 'gdg-app'; }
 
       static get properties() {
         return {
@@ -399,13 +388,13 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
       _pageChanged(page, oldPage) {
         if (page != null) {
-          document.body.scrollTop = 0;
+          this.shadowRoot.querySelector('app-header-layout').header.scroll(0, 0);
           if (page == 'home') {
             this._pageLoaded(Boolean(oldPage));
           } else {
             let cb = this._pageLoaded.bind(this, Boolean(oldPage));
             Polymer.importHref(
-              this.resolveUrl('io-' + page + '.html'),
+              this.resolveUrl('gdg-' + page + '.html'),
               cb, cb, true);
           }
         }
@@ -429,18 +418,22 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             Polymer.importHref(this.resolveUrl('lazy-resources.html'), () => {
               this.loadComplete = true;
               this._ensureLazyLoaded();
+              
+              this.shadowRoot.querySelector('gdg-schedule').addEventListener('showdialog', e => {
+                this.shadowRoot.querySelector('#dialog').open(e)
+              });
 
-              this.shadowRoot.querySelector('io-sessions').addEventListener('showdialog', e => {
+              this.shadowRoot.querySelector('gdg-speakers').addEventListener('showdialog', e => {
                 this.shadowRoot.querySelector('#dialog').open(e)
               });
 
               var config = {
-                apiKey: "AIzaSyAehpQe5zbO1JkVoe3pmnCNocmxoGxmlqU",
-                authDomain: "ioxkl17.firebaseapp.com",
-                databaseURL: "https://ioxkl17.firebaseio.com",
-                projectId: "ioxkl17",
-                storageBucket: "ioxkl17.appspot.com",
-                messagingSenderId: "367508360845"
+                apiKey: "AIzaSyBZLtu9yYJX3EYP4oodHx64mwdgatkW42c",
+                authDomain: "gdgkl-websummit.firebaseapp.com",
+                databaseURL: "https://gdgkl-websummit.firebaseio.com",
+                projectId: "gdgkl-websummit",
+                storageBucket: "gdgkl-websummit.appspot.com",
+                messagingSenderId: "715665586418"
               };
 
               if (!firebase.apps.length) {
@@ -493,7 +486,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
             else {
               this.shadowRoot.querySelector('app-header').toggleScrollListener(true);
               document.body.style.overflow = 'initial';
-              Polymer.AppLayout.scroll({ top: this.scrollPos, behavior: 'silent' });
             }
           })
         }
@@ -517,6 +509,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     }
 
-    window.customElements.define(IoApp.is, IoApp);
+    window.customElements.define(GdgApp.is, GdgApp);
   </script>
 </dom-module>
